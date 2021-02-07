@@ -178,9 +178,12 @@ public class BrokerController {
         this.nettyServerConfig = nettyServerConfig;
         this.nettyClientConfig = nettyClientConfig;
         this.messageStoreConfig = messageStoreConfig;
+        //初始化offset管理器，主要用于处理客户端提交上来的offset信息
         this.consumerOffsetManager = new ConsumerOffsetManager(this);
         this.topicConfigManager = new TopicConfigManager(this);
+        //拉取消息处理器
         this.pullMessageProcessor = new PullMessageProcessor(this);
+        //请求挂起
         this.pullRequestHoldService = new PullRequestHoldService(this);
         this.messageArrivingListener = new NotifyMessageArrivingListener(this.pullRequestHoldService);
         this.consumerIdsChangeListener = new DefaultConsumerIdsChangeListener(this);
@@ -190,11 +193,13 @@ public class BrokerController {
         this.clientHousekeepingService = new ClientHousekeepingService(this);
         this.broker2Client = new Broker2Client(this);
         this.subscriptionGroupManager = new SubscriptionGroupManager(this);
+        // 客户端接入服务
         this.brokerOuterAPI = new BrokerOuterAPI(nettyClientConfig);
         this.filterServerManager = new FilterServerManager(this);
 
+        //slave数据同步
         this.slaveSynchronize = new SlaveSynchronize(this);
-
+        //处理写入、拉取、查询、重试
         this.sendThreadPoolQueue = new LinkedBlockingQueue<Runnable>(this.brokerConfig.getSendThreadPoolQueueCapacity());
         this.pullThreadPoolQueue = new LinkedBlockingQueue<Runnable>(this.brokerConfig.getPullThreadPoolQueueCapacity());
         this.replyThreadPoolQueue = new LinkedBlockingQueue<Runnable>(this.brokerConfig.getReplyThreadPoolQueueCapacity());
@@ -850,6 +855,7 @@ public class BrokerController {
 
     public void start() throws Exception {
         if (this.messageStore != null) {
+            //消息存储
             this.messageStore.start();
         }
 
@@ -887,6 +893,7 @@ public class BrokerController {
             this.registerBrokerAll(true, false, true);
         }
 
+        //向所有NameServer发送心跳
         this.scheduledExecutorService.scheduleAtFixedRate(new Runnable() {
 
             @Override

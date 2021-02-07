@@ -278,6 +278,7 @@ public class DefaultMessageStore implements MessageStore {
             this.recoverTopicQueueTable();
         }
 
+        //未开启DLeger
         if (!messageStoreConfig.isEnableDLegerCommitLog()) {
             this.haService.start();
             this.handleScheduleMessageService(messageStoreConfig.getBrokerRole());
@@ -1813,6 +1814,7 @@ public class DefaultMessageStore implements MessageStore {
         }
     }
 
+    //同步ConsumeQueue
     class FlushConsumeQueueService extends ServiceThread {
         private static final int RETRY_TIMES_OVER = 3;
         private long lastFlushTimestamp = 0;

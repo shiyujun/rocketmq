@@ -901,7 +901,10 @@ public class CommitLog {
         storeStatsService.getSinglePutMessageTopicTimesTotal(msg.getTopic()).incrementAndGet();
         storeStatsService.getSinglePutMessageTopicSizeTotal(topic).addAndGet(result.getWroteBytes());
 
+        //是否需要同步刷盘
         handleDiskFlush(result, putMessageResult, msg);
+
+        //高可用逻辑
         handleHA(result, putMessageResult, msg);
 
         return putMessageResult;
